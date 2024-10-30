@@ -1,7 +1,5 @@
 import hashlib
-import sqlite3
 import colors.colors as color
-
 
 class User:
     def __init__(self, username, password):
@@ -13,21 +11,14 @@ class User:
         return hashlib.sha256(password.encode()).hexdigest()
 
     def register(self, db):
-        try:
-            db.cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (self.username, self.password))
-            db.connection.commit()
-            print(color.green("Zarejestrowano użytkownika"))
-        except sqlite3.IntegrityError:
-            print(color.red("Nazwa użytkownika już istnieje wybierz inną"))
+        db.add_user(self.username, self.password)
 
     @staticmethod
     def login(db, username, password):
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
-        db.cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, hashed_password))
-        user = db.cursor.fetchone()
-        if user:
-            print(color.green("Zalogowano!"))
+        user = db.get_user(username)
+        if user and user[2] == hashlib.sha256(password.encode()).hexdigest():
+            print(color.green("Zalogowano pomyślnie!"))
             return True
         else:
-            print(color.red("Nieprawidłowe dane logownia"))
+            print(color.red("Błędna nazwa użytkownika lub hasło."))
             return False
