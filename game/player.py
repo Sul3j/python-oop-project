@@ -1,3 +1,5 @@
+import colors.colors as color
+
 class Player:
     def __init__(self, name, balance):
         self.name = name
@@ -14,5 +16,5 @@ class Player:
     # odejmowanie określonej stawki
     def substract_rate(self, rate):
         if rate > self._balance:
-            raise ValueError("Niewystarczające środki na koncie.")
+            raise ValueError(color.red("Niewystarczające środki na koncie."))
         self._balance -= rate

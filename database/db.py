@@ -16,29 +16,28 @@ class Database:
             )
         ''')
         self.cursor.execute('''
-            CREATE TABLE IF NOT EXISTS players (
+            CREATE TABLE IF NOT EXISTS ranking (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE,
-                password TEXT
+                name TEXT UNIQUE NOT NULL,
+                wins INTEGER DEFAULT 0
             )
         ''')
-
         self.connection.commit()
 
     def close(self):
         self.connection.close()
 
-    def add_player(self, name, wins):
+    def add_player_ranking_value(self, name, wins):
         c = self.connection.cursor()
         try:
-            c.execute('INSERT INTO players (name, wins) VALUES (?, ?)', (name, wins))
+            c.execute('INSERT INTO ranking (name, wins) VALUES (?, ?)', (name, wins))
         except sqlite3.IntegrityError:
-            c.execute('UPDATE players SET wins = wins + ? WHERE name = ?', (wins, name))
+            c.execute('UPDATE ranking SET wins = wins + ? WHERE name = ?', (wins, name))
         self.connection.commit()
 
     def show_top(self):
         c = self.connection.cursor()
-        self.connection.commit('SELECT name, wins FROM players ORDER BY wins DESC LIMIT 100')
+        c.execute('SELECT name, wins FROM ranking ORDER BY wins DESC LIMIT 100')
         rows = c.fetchall()
         print(color.yellow("\nTOP 100 Graczy:"))
         for row in rows:

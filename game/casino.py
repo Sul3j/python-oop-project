@@ -1,13 +1,13 @@
-from random import choice
 from database.db import Database
 from game.blackJack import BlackJack
 from game.oneArmedBandit import OneArmedBandit
 from game.player import Player
 from game.roulette import Roulette
+import colors.colors as color
 
 class Casino:
     def __init__(self):
-        self.connection = Database()
+        self.db_connection = Database()
         self.games = {
             '1': 'Ruletka',
             '2': 'Jednoręki Bandyta',
@@ -15,12 +15,12 @@ class Casino:
         }
 
     def choose_game(self):
-        print("Wybierz grę: ")
+        print(color.red("Wybierz grę: "))
         for key, value in self.games.items():
             print(f"{key}: {value}")
         print('4: Wyświetl TOP 100 graczy')
         print('5: Wyjdź z gry')
-        choice = input("Podaj numer gry: ")
+        choice = input(color.yellow("Wybierz opcje: "))
         return choice
 
     def launch_game(self, name):
@@ -36,20 +36,20 @@ class Casino:
             elif choice == '3':
                 game = BlackJack(player)
             elif choice == '4':
-                self.connection.show_top()
+                self.db_connection.show_top()
                 continue
             elif choice == '5':
-                print("Dziękujemy za grę!")
+                print(color.yellow("Dziękujemy za grę!"))
                 break
             else:
-                print("Nieprawidłowy wybór, spróbuj ponownie.")
+                print(color.red("Nieprawidłowy wybór, spróbuj ponownie."))
                 continue
 
             game.play()
-            print(f"Twoje saldo: {player.balance} PLN")
-            self.connection.add_player(name, player.balance)
+            print(color.green(f"Twoje saldo: {player.balance} PLN"))
+            self.db_connection.add_player_ranking_value(name, player.balance)
 
-            continue_game = input("Czy chcesz zmienić grę? (tak/nie): ").lower()
-            if continue_game != 'tak':
-                print("Dziękujemy za grę!")
+            continue_game = input(color.yellow("Zostań w kasynie (k), wyjdź z aplikacji (x): ")).lower()
+            if continue_game != 'k':
+                print(color.yellow("Dziękujemy za grę!"))
                 break

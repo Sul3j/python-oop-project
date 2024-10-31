@@ -1,6 +1,6 @@
-from random import random
-
+import random
 from game.casinoGame import CasinoGame
+import colors.colors as text_color
 
 class BlackJack(CasinoGame):
     def __init__(self, player):
@@ -21,11 +21,11 @@ class BlackJack(CasinoGame):
         self.shuffle()
         while True:
             try:
-                rate = float(input("Podaj kwotę stawki: "))
+                rate = float(input(text_color.yellow("Podaj kwotę stawki: ")))
                 self.check_balance(rate)
                 break
             except ValueError as e:
-                print(f"Błąd: {e}")
+                print(text_color.red(f"Błąd: {e}"))
 
         self.player.hand = []
         self.dealer_hand = []
@@ -34,22 +34,23 @@ class BlackJack(CasinoGame):
         self.hand_out_cards(2)
         self.dealer_hand_out_cards(2)
 
-        print(f"\nTwoja ręka: {self.player.hand}, suma: {self.calculate_hand_value(self.player.hand)}")
-        print(f"Karta krupiera: {self.dealer_hand[0]} oraz jedna zakryta")
+        print(text_color.green(f"\nTwoja ręka: {self.player.hand}, suma: {self.calculate_hand_value(self.player.hand)}"))
+        print(text_color.green(f"Karta krupiera: {self.dealer_hand[0]} oraz jedna zakryta"))
 
         # Tura gracza
         while True:
-            action = input("Wybierz akcję (dobierz / passuj): ").lower()
-            self.pick_card()
-            print(f"Twoja ręka: {self.player.hand}, suma: {self.calculate_hand_value(self.player.hand)}")
-            if self.calculate_hand_value(self.player.hand) > 21:
-                print("Przegrałeś!")
-                self.player.substract_rate(rate)
-                return
+            action = input(text_color.yellow("Wybierz akcję (dobierz / passuj): ")).lower()
+            if action == 'dobierz':
+                self.pick_card()
+                print(text_color.green(f"Twoja ręka: {self.player.hand}, suma: {self.calculate_hand_value(self.player.hand)}"))
+                if self.calculate_hand_value(self.player.hand) > 21:
+                    print(text_color.red("Przegrałeś!"))
+                    self.player.substract_rate(rate)
+                    return
             elif action == 'passuj':
                 break
             else:
-                print("Nieprawidłowa akcja!")
+                print(text_color.red("Nieprawidłowa akcja!"))
 
         # tura krupiera
         while self.calculate_hand_value(self.dealer_hand) < 17:
@@ -81,7 +82,8 @@ class BlackJack(CasinoGame):
         self.dealer_hand.append(card)
 
     # obliczanie wartości ręki
-    def calculate_hand_value(self, hand):
+    @staticmethod
+    def calculate_hand_value(hand):
         value = 0
         aces = 0
         for card in hand:
@@ -91,28 +93,32 @@ class BlackJack(CasinoGame):
                 aces += 1
                 value += 11
             else:
-                value -= 10
-                aces -= 1
-            return value
+                value += int(card[0])
+
+        while value > 21 and aces:
+            value -= 10
+            aces -= 1
+
+        return value
 
     # sprawdzanie wyniku gry
     def check_result(self, rate):
         player_value = self.calculate_hand_value(self.player.hand)
         dealer_value = self.calculate_hand_value(self.dealer_hand)
 
-        print(f"\nTwoja suma: {player_value}, suma krupiera: {dealer_value}")
+        print(text_color.red(f"\nTwoja suma: {player_value}, suma krupiera: {dealer_value}"))
 
         if player_value > 21:
-            print("Przegrałeś!")
+            print(text_color.red("Przegrałeś!"))
             self.player.substract_rate(rate)
         elif dealer_value > 21 or player_value > dealer_value:
             wins = rate * 2
             self.player.add_wins(wins)
-            print(f"Wygrałeś {wins} PLN!")
+            print(text_color.green(f"Wygrałeś {wins} PLN!"))
         elif player_value < dealer_value:
-            print("Przegrałeś!")
+            print(text_color.red("Przegrałeś!"))
             self.player.substract_rate(rate)
         else:
-            print("Remis! Twoja stawka została zwrócona.")
+            print(text_color.yellow("Remis! Twoja stawka została zwrócona."))
 
 

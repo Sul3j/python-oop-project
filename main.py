@@ -1,15 +1,17 @@
 import database.db as database
 import auth.auth as auth
 import colors.colors as color
+from game.casino import Casino
+
 
 def main():
     db = database.Database()
     while True:
-        print("\nWitaj w aplikacji")
+        print(color.red("\nWitaj w aplikacji"))
         print("1. Zarejestruj się")
         print("2. Zaloguj się")
         print("3. Wyjdź")
-        choice = input("Wybierz opcję: ")
+        choice = input(color.yellow("Wybierz opcję: "))
 
         if choice == "1":
             username = input(color.yellow("Wprowadź nazwę użytkownika: "))
@@ -20,10 +22,12 @@ def main():
         elif choice == "2":
             username = input(color.yellow("Wprowadź nazwę użytkownika: "))
             password = input(color.yellow("Wprowadź hasło: "))
-            auth.User.login(db, username, password)
+            if auth.User.login(db, username, password):
+                casino = Casino()
+                casino.launch_game(username)
 
         elif choice == "3":
-            print(color.yellow("Zamykanie aplikacji."))
+            print(color.red("Zamykanie aplikacji."))
             db.close()
             break
 

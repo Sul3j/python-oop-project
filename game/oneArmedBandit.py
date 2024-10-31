@@ -1,5 +1,6 @@
-from random import random
+import random
 from game.casinoGame import CasinoGame
+import colors.colors as color
 
 class OneArmedBandit(CasinoGame):
     def __init__(self, player):
@@ -17,25 +18,25 @@ class OneArmedBandit(CasinoGame):
     def play(self):
         while True:
             try:
-                rate = float(input("Podaj kwotę stawki: "))
+                rate = float(input(color.yellow("Podaj kwotę stawki: ")))
                 self.check_balance(rate)
                 break
             except ValueError as e:
-                print(f"Błąd: {e}")
+                print(color.red(f"Błąd: {e}"))
         results = self.check_result()
         self.calculate_win(results, rate)
 
     def check_result(self):
         results = [random.choice(self.symbols) for _ in range(3)]
-        print(f"Wynik gry: {' '.join(results)}")
+        print(color.yellow(f"Wynik gry: {' '.join(results)}"))
         return ''.join(results)
 
     def calculate_win(self, results, rate):
         if results in self.wins:
             win = self.wins[results] * rate
             self.player.add_wins(results)
-            print(f"Gratulacje! Wygrałeś {win} PLN!")
+            print(color.green(f"Gratulacje! Wygrałeś {win} PLN!"))
         else:
             self.player.substract_rate(rate)
-            print("Przegrałeś! Spróbuj ponownie.")
+            print(color.red("Przegrałeś! Spróbuj ponownie."))
 
