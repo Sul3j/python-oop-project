@@ -1,7 +1,5 @@
 from random import random
-
 from game.casinoGame import CasinoGame
-
 
 class OneArmedBandit(CasinoGame):
     def __init__(self, player):
