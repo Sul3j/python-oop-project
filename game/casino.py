@@ -4,6 +4,7 @@ from game.oneArmedBandit import OneArmedBandit
 from game.player import Player
 from game.roulette import Roulette
 import colors.colors as color
+import random
 
 class Casino:
     def __init__(self):
@@ -24,7 +25,16 @@ class Casino:
         return choice
 
     def launch_game(self, name):
-        balance = float(input("Podaj początkowe saldo: "))
+        balance = self.db_connection.get_user_balance(name)
+
+        if balance is None or balance <= 0:
+            # Losowe saldo od 0 do 5000
+            balance = random.uniform(0, 5000)
+            self.db_connection.update_user_balance(name, balance)
+            print(color.green(f"Przydzielono losowe saldo: {balance:.2f} PLN"))
+        else:
+            print(color.green(f"Twoje saldo wynosi: {balance:.2f} PLN"))
+
         player = Player(name, balance)
 
         while True:
@@ -47,6 +57,7 @@ class Casino:
 
             game.play()
             print(color.green(f"Twoje saldo: {player.balance} PLN"))
+            self.db_connection.update_user_balance(name, player.balance)
             self.db_connection.add_player_ranking_value(name, player.balance)
 
             continue_game = input(color.yellow("Zostań w kasynie (k), wyjdź z aplikacji (x): ")).lower()

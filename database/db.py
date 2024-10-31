@@ -12,7 +12,8 @@ class Database:
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL
+                password TEXT NOT NULL,
+                balance INTEGER DEFAULT 0
             )
         ''')
         self.cursor.execute('''
@@ -57,3 +58,13 @@ class Database:
         c.execute("SELECT * FROM users WHERE username = ?", (username,))
         return c.fetchone()
 
+    def get_user_balance(self, username):
+        c = self.connection.cursor()
+        c.execute("SELECT balance FROM users WHERE username = ?", (username,))
+        result = c.fetchone()
+        return result[0] if result else None
+
+    def update_user_balance(self, username, balance):
+        c = self.connection.cursor()
+        c.execute("UPDATE users SET balance = ? WHERE username = ?", (balance, username))
+        self.connection.commit()
