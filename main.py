@@ -3,14 +3,13 @@ import auth.auth as auth
 import colors.colors as color
 from game.casino import Casino
 
-
 def main():
     db = database.Database()
     while True:
         print(color.red("\nWitaj w aplikacji"))
-        print("1. Zarejestruj się")
-        print("2. Zaloguj się")
-        print("3. Wyjdź")
+        print("1: Zarejestruj się")
+        print("2: Zaloguj się")
+        print("3: Wyjdź")
         choice = input(color.yellow("Wybierz opcję: "))
 
         if choice == "1":

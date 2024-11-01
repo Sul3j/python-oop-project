@@ -1,6 +1,7 @@
 import random
 from game.casinoGame import CasinoGame
 import colors.colors as text_color
+from database.db import Database
 
 class BlackJack(CasinoGame):
     def __init__(self, player):
@@ -8,11 +9,21 @@ class BlackJack(CasinoGame):
         self.waist = self.create_waist()
         self.dealer_hand = []
 
+    database_connection = Database()
+
     @staticmethod
     def create_waist():
         colors = ['Kier', 'Karo', 'Trefl', 'Pik']
         numbers = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
         return [(number, color) for color in colors for number in numbers]
+
+    def add_wins(self, name, wins):
+        previous_wins = self.database_connection.get_user_wins(name)
+        self.database_connection.add_player_ranking_value(name, previous_wins + wins)
+
+    def sub_wins(self, name, wins):
+        previous_wins = self.database_connection.get_user_wins(name)
+        self.database_connection.add_player_ranking_value(name, previous_wins - wins)
 
     def shuffle(self):
         random.shuffle(self.waist)
@@ -109,15 +120,18 @@ class BlackJack(CasinoGame):
         print(text_color.red(f"\nTwoja suma: {player_value}, suma krupiera: {dealer_value}"))
 
         if player_value > 21:
-            print(text_color.red("Przegrałeś!"))
             self.player.substract_rate(rate)
+            self.sub_wins(self.player.name, rate)
+            print(text_color.red("Przegrałeś!"))
         elif dealer_value > 21 or player_value > dealer_value:
             wins = rate * 2
             self.player.add_wins(wins)
+            self.add_wins(self.player.name, wins - rate)
             print(text_color.green(f"Wygrałeś {wins} PLN!"))
         elif player_value < dealer_value:
-            print(text_color.red("Przegrałeś!"))
+            self.sub_wins(self.player.name, rate)
             self.player.substract_rate(rate)
+            print(text_color.red("Przegrałeś!"))
         else:
             print(text_color.yellow("Remis! Twoja stawka została zwrócona."))
 

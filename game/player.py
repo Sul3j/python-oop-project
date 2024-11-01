@@ -11,7 +11,7 @@ class Player:
 
     # dodwanie środków
     def add_wins(self, amount):
-        self._balance += amount
+        self._balance += (amount / 2)
 
     # odejmowanie określonej stawki
     def substract_rate(self, rate):

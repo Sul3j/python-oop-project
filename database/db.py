@@ -33,7 +33,7 @@ class Database:
         try:
             c.execute('INSERT INTO ranking (name, wins) VALUES (?, ?)', (name, wins))
         except sqlite3.IntegrityError:
-            c.execute('UPDATE ranking SET wins = wins + ? WHERE name = ?', (wins, name))
+            c.execute('UPDATE ranking SET wins = ? WHERE name = ?', (wins, name))
         self.connection.commit()
 
     def show_top(self):
@@ -68,3 +68,9 @@ class Database:
         c = self.connection.cursor()
         c.execute("UPDATE users SET balance = ? WHERE username = ?", (balance, username))
         self.connection.commit()
+
+    def get_user_wins(self, username):
+        c = self.connection.cursor()
+        c.execute("SELECT wins FROM ranking WHERE name = ?", (username,))
+        result = c.fetchone()
+        return result[0] if result else 0

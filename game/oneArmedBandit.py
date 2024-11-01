@@ -1,10 +1,12 @@
 import random
 from game.casinoGame import CasinoGame
 import colors.colors as color
+from database.db import Database
 
 class OneArmedBandit(CasinoGame):
     def __init__(self, player):
         super().__init__(player)
+        self.db_connection = Database()
         self.symbols = ["🍒", "🍋", "🍊", "🍉", "⭐", "💰"]
         self.wins = {
             "🍒🍒🍒": 5,
@@ -35,8 +37,12 @@ class OneArmedBandit(CasinoGame):
         if results in self.wins:
             win = self.wins[results] * rate
             self.player.add_wins(results)
+            previous_wins = self.db_connection.get_user_wins(self.player.name)
+            self.db_connection.add_player_ranking_value(self.player.name, previous_wins + (win - rate))
             print(color.green(f"Gratulacje! Wygrałeś {win} PLN!"))
         else:
             self.player.substract_rate(rate)
+            previous_wins = self.db_connection.get_user_wins(self.player.name)
+            self.db_connection.add_player_ranking_value(self.player.name, previous_wins - rate)
             print(color.red("Przegrałeś! Spróbuj ponownie."))
 

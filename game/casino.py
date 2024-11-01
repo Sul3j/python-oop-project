@@ -29,7 +29,7 @@ class Casino:
 
         if balance is None or balance <= 0:
             # Losowe saldo od 0 do 5000
-            balance = random.uniform(0, 5000)
+            balance = round(random.uniform(0, 5000), 0)
             self.db_connection.update_user_balance(name, balance)
             print(color.green(f"Przydzielono losowe saldo: {balance:.2f} PLN"))
         else:
@@ -58,7 +58,6 @@ class Casino:
             game.play()
             print(color.green(f"Twoje saldo: {player.balance} PLN"))
             self.db_connection.update_user_balance(name, player.balance)
-            self.db_connection.add_player_ranking_value(name, player.balance)
 
             continue_game = input(color.yellow("Zostań w kasynie (k), wyjdź z aplikacji (x): ")).lower()
             if continue_game != 'k':
